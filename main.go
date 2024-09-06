@@ -15,6 +15,7 @@ func main() {
 			cmd.Dirname,
 			cmd.Which,
 			cmd.Exec,
+			cmd.Cp,
 		},
 	}
 	if err := app.Run(os.Args); err != nil {
