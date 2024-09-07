@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/das6ng/badbox/arg"
 	"github.com/samber/lo"
 	"github.com/urfave/cli/v2"
 )
@@ -15,7 +16,7 @@ var Exec = &cli.Command{
 	Usage:  "exec a command in specified env, such as extra PATH dir",
 	Action: cmdExec,
 	Flags: []cli.Flag{
-		&cli.StringSliceFlag{Name: "env-var", Aliases: []string{"e"}, Usage: "add env var, in format '-e name=val'"},
+		&cli.StringSliceFlag{Name: "env-var", Aliases: []string{"e"}, Usage: "add env var"},
 		&cli.StringSliceFlag{Name: "env-path", Aliases: []string{"p"}, Usage: "add extra item to PATH"},
 		&cli.StringSliceFlag{Name: "env-path-overwrite", Aliases: []string{"po"}, Usage: "overwrite PATH env var"},
 		&cli.StringFlag{Name: "work-dir", Aliases: []string{"wd"}, Usage: "set work dir"},
@@ -23,12 +24,12 @@ var Exec = &cli.Command{
 }
 
 func cmdExec(cCtx *cli.Context) error {
-	arg := cCtx.Args().Slice()
-	if len(arg) == 0 {
+	origArgs := cCtx.Args().Slice()
+	if len(origArgs) == 0 {
 		return nil
 	}
-	bin := arg[0]
-	args := arg[1:]
+	bin := origArgs[0]
+	args := append(origArgs[1:], arg.ExtraArgsFromCtx(cCtx.Context)...)
 	cmd := exec.CommandContext(cCtx.Context, bin, args...)
 	cmd.Stdin = os.Stdin
 	// cmd.Stdout = os.Stdout
