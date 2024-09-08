@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -13,7 +12,7 @@ import (
 
 var Exec = &cli.Command{
 	Name:   "exec",
-	Usage:  "exec a command in specified env, such as extra PATH dir",
+	Usage:  "exec a command in specified env, such as extra PATH dir\n",
 	Action: cmdExec,
 	Flags: []cli.Flag{
 		&cli.StringSliceFlag{Name: "env-var", Aliases: []string{"e"}, Usage: "add env var"},
@@ -32,8 +31,8 @@ func cmdExec(cCtx *cli.Context) error {
 	args := append(origArgs[1:], arg.ExtraArgsFromCtx(cCtx.Context)...)
 	cmd := exec.CommandContext(cCtx.Context, bin, args...)
 	cmd.Stdin = os.Stdin
-	// cmd.Stdout = os.Stdout
-	// cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	// set PATH env var
 	envPath := cCtx.StringSlice("env-path-overwrite")
@@ -69,10 +68,9 @@ func cmdExec(cCtx *cli.Context) error {
 	}
 
 	// run command
-	out, err := cmd.CombinedOutput()
+	err := cmd.Run()
 	if err != nil {
 		return err
 	}
-	fmt.Print(string(out))
 	return nil
 }
